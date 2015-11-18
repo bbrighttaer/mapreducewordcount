@@ -6,8 +6,13 @@
 package org.mapreduce.martin.mapreducewordcount.app;
 
 import ch.qos.logback.classic.Logger;
+import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.mapreduce.martin.mapreducewordcount.algorithms.Mapping;
+import org.mapreduce.martin.mapreducewordcount.algorithms.Reduce;
+import org.mapreduce.martin.mapreducewordcount.algorithms.Shuffling;
 import org.mapreduce.martin.mapreducewordcount.algorithms.Splitting;
 import org.mapreduce.martin.mapreducewordcount.util.ObjectFactory;
 import org.slf4j.LoggerFactory;
@@ -26,27 +31,45 @@ public class WordCount
     public static void main(String[] args) 
     {
         // Splitting
-        logger.info("-------------BEGIN SPLITTING-------------------");
-        Splitting splitting = ObjectFactory.creatSplittingObject();
+        Splitting splitting = ObjectFactory.createSplittingObject();
         String[] linesStr;
-        linesStr = splitting.splitFileContent();
-        for (String linesStr1 : linesStr) {
-            System.out.println(linesStr1);
-        }
-        logger.info("-------------END SPLITTING-------------------");     
-        
-        System.out.println("");
-        
+        linesStr = splitting.splitFileContent();            
         
         //Mapping        
-        logger.info("-------------BEGIN MAPPING-------------------");
-        Mapping mapping = ObjectFactory.creatMappingObject();
-        Map<String, Integer> wordsTallyMap = mapping.perfromMapping(linesStr[0]);
-        System.out.println("wordsTallyMap: "+wordsTallyMap.size());
-        for(String word : wordsTallyMap.keySet())
-        {
-            System.out.println(word+", "+wordsTallyMap.get(word));
+        ExecutorService e = Executors.newFixedThreadPool(linesStr.length);
+        for (final String line : linesStr) {
+            e.submit(new Runnable() {
+
+                @Override
+                public void run() 
+                {  
+                    Mapping mapping = ObjectFactory.createMappingObject();
+                    Map<String, Integer> wordsTallyMap = mapping.perfromMapping(line);
+                    
+                    //Shuffling
+                    for(String word : wordsTallyMap.keySet())
+                    {
+                        Shuffling shuffling = ObjectFactory.createShufflingObject();
+                        int frequency = wordsTallyMap.get(word);
+                        for(int i=0; i<frequency; i++)
+                        {
+                            shuffling.add(word);
+                        }
+                    }
+                }
+            });
         }
-        logger.info("-------------END SPLITTING-------------------");
+        e.shutdown();
+        
+        //Reduce
+        while(!e.isTerminated()){}//waits for all tasks to be completed
+        Shuffling shuffling = ObjectFactory.createShufflingObject();
+        Collection<String> shuffledData = shuffling.getShuffledData();
+        Reduce reduce = ObjectFactory.createReduceObject();
+        Map<String, Integer> reducedData = reduce.performReduce(shuffledData);
+        for(String word : reducedData.keySet())
+        {
+            System.out.println(word+", "+reducedData.get(word));
+        }
     }
 }

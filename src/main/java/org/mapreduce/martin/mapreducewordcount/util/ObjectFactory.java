@@ -6,6 +6,8 @@
 package org.mapreduce.martin.mapreducewordcount.util;
 
 import org.mapreduce.martin.mapreducewordcount.algorithms.Mapping;
+import org.mapreduce.martin.mapreducewordcount.algorithms.Reduce;
+import org.mapreduce.martin.mapreducewordcount.algorithms.Shuffling;
 import org.mapreduce.martin.mapreducewordcount.algorithms.Splitting;
 
 /**
@@ -18,18 +20,28 @@ public class ObjectFactory
     public ObjectFactory() {
     }
     
-    public static FileLoader creatFileLoaderObject()
+    public static FileLoader createFileLoaderObject()
     {
         return new FileLoader();
     }
     
-    public static Splitting creatSplittingObject()
+    public static Splitting createSplittingObject()
     {
         return new Splitting();
     }
     
-    public static Mapping creatMappingObject()
+    public static Mapping createMappingObject()
     {
         return new Mapping();
+    }
+    
+    public static Shuffling createShufflingObject()
+    {
+        return new Shuffling();
+    }
+    
+    public static Reduce createReduceObject()
+    {
+        return new Reduce();
     }
 }

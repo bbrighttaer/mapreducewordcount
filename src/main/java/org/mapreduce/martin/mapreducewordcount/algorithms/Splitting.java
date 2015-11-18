@@ -23,11 +23,11 @@ public class Splitting
 {
     private static final Logger logger = (Logger) LoggerFactory.getLogger(Splitting.class);
     private final FileLoader fileLoader;
-    private final String txt_filename = "/words.txt";
+    private final String txt_filename = "/words_2.txt";
     private final String splittingDelimiter = "\n";
 
     public Splitting() {
-        this.fileLoader = ObjectFactory.creatFileLoaderObject();
+        this.fileLoader = ObjectFactory.createFileLoaderObject();
     }
     
     public String[] splitFileContent()

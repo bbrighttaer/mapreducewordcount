@@ -48,6 +48,7 @@ public class Mapping
             int counter = 0;
             for(String w : wordsInLine)
             {
+                w = cleanWord(w);
                 if(word.equalsIgnoreCase(w))
                 {
                     counter++;
@@ -69,10 +70,10 @@ public class Mapping
      */
     public String cleanWord(String word)
     {
-        String[] delimiters = {"\n", " ", "  "};
+        String[] delimiters = {"\n", " ", "  ", "\r", ".", ","};
         for(String del : delimiters)
         {
-            word = StringUtils.remove(word, del);
+            word = StringUtils.remove(word, del).trim();
         }
         return word;
     }
