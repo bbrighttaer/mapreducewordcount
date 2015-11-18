@@ -5,6 +5,7 @@
  */
 package org.mapreduce.martin.mapreducewordcount.util;
 
+import org.mapreduce.martin.mapreducewordcount.algorithms.Mapping;
 import org.mapreduce.martin.mapreducewordcount.algorithms.Splitting;
 
 /**
@@ -25,5 +26,10 @@ public class ObjectFactory
     public static Splitting creatSplittingObject()
     {
         return new Splitting();
+    }
+    
+    public static Mapping creatMappingObject()
+    {
+        return new Mapping();
     }
 }
